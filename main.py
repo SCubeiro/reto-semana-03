@@ -1,15 +1,52 @@
 import sys
 
-def main():
-    # Diccionario para agrupar por producto
+def parsear_linea(linea):
+    """Parsea una linea CSV y retorna (producto, cantidad, precio) o None si es invalida."""
+    partes = linea.split(',')
+    if len(partes) != 4:
+        return None
+
+    producto = partes[1]
+
+    try:
+        cantidad = int(partes[2])
+        precio = float(partes[3])
+    except ValueError:
+        return None
+
+    return producto, cantidad, precio
+
+
+def agrupar_ventas(lineas):
+    """Agrupa las transacciones por producto acumulando unidades e ingresos."""
     productos = {}
 
+    for linea in lineas:
+        resultado = parsear_linea(linea)
+        if resultado is None:
+            continue
+
+        producto, cantidad, precio = resultado
+
+        if producto not in productos:
+            productos[producto] = {
+                "unidades": 0,
+                "ingreso": 0.0
+            }
+
+        productos[producto]["unidades"] += cantidad
+        productos[producto]["ingreso"] += cantidad * precio
+
+    return productos
+
+
+def main():
+    lineas = []
     primera_linea = True
 
     for linea in sys.stdin:
         linea = linea.strip()
 
-        # Saltar encabezado
         if primera_linea:
             primera_linea = False
             continue
@@ -17,31 +54,16 @@ def main():
         if not linea:
             continue
 
-        partes = linea.split(',')
-        if len(partes) != 4:
-            continue
+        lineas.append(linea)
 
-        fecha = partes[0]
-        producto = partes[1]
-        cantidad = int(partes[2])
-        precio = float(partes[3])
+    # Agrupar transacciones por producto
+    productos = agrupar_ventas(lineas)
 
-        # Si el producto no existe, crearlo
-        if producto not in productos:
-            productos[producto] = {
-                "unidades": 0,
-                "ingreso": 0.0
-            }
-
-        # Acumular valores
-        productos[producto]["unidades"] += cantidad
-        productos[producto]["ingreso"] += cantidad * precio
-
-    # Calcular precio promedio por producto
+    # Calcular precio promedio
     for prod in productos:
         unidades = productos[prod]["unidades"]
         ingreso = productos[prod]["ingreso"]
-        productos[prod]["promedio"] = ingreso / unidades
+        productos[prod]["promedio"] = ingreso / unidades if unidades > 0 else 0.0
 
     # Ordenar por ingreso total descendente
     productos_ordenados = sorted(
@@ -54,6 +76,7 @@ def main():
     print("producto,unidades_vendidas,ingreso_total,precio_promedio")
     for nombre, datos in productos_ordenados:
         print(f"{nombre},{datos['unidades']},{datos['ingreso']:.2f},{datos['promedio']:.2f}")
+
 
 if __name__ == "__main__":
     main()
