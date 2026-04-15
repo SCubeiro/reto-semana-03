@@ -37,9 +37,23 @@ def main():
         productos[producto]["unidades"] += cantidad
         productos[producto]["ingreso"] += cantidad * precio
 
-    # Debug: imprimir lo que tenemos
-    for prod, datos in productos.items():
-        print(f"{prod}: {datos}")
+    # Calcular precio promedio por producto
+    for prod in productos:
+        unidades = productos[prod]["unidades"]
+        ingreso = productos[prod]["ingreso"]
+        productos[prod]["promedio"] = ingreso / unidades
+
+    # Ordenar por ingreso total descendente
+    productos_ordenados = sorted(
+        productos.items(),
+        key=lambda x: x[1]["ingreso"],
+        reverse=True
+    )
+
+    # Imprimir salida CSV
+    print("producto,unidades_vendidas,ingreso_total,precio_promedio")
+    for nombre, datos in productos_ordenados:
+        print(f"{nombre},{datos['unidades']},{datos['ingreso']:.2f},{datos['promedio']:.2f}")
 
 if __name__ == "__main__":
     main()
