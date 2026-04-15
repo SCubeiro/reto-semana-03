@@ -60,6 +60,12 @@ python3 main.py < tests/entrada2.txt | diff - tests/salida2.txt
 python3 main.py < tests/entrada3.txt | diff - tests/salida3.txt
 ```
 
+| Caso | Descripción |
+|------|-------------|
+| 1    | Ejemplo principal: Laptop, Mouse, Teclado |
+| 2    | Datos inválidos: cantidad y precio no numéricos, línea incompleta |
+| 3    | Decimales, líneas vacías, múltiples productos |
+
 ## Autor
 
 Santiago Alexey Corona Cubeiro
